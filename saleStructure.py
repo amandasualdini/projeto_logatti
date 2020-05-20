@@ -3,7 +3,8 @@ import pymongo
 from Cliente import Cliente
 from Funcionario import Funcionario
 from Produto import Produto
-# from Venda import Venda
+from Venda import Venda
+from VendaItem import VendaItem
 
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
@@ -11,12 +12,13 @@ mydb = myclient["projeto_mongodb_python"]
 col_cliente = mydb["cliente"]
 col_funcionario = mydb["funcionario"]
 col_produto = mydb["produto"]
-# col_venda = mydb["venda"]
+col_venda = mydb["venda"]
+col_venda_item = mydb["vendaItem"]
 
 
 
-def mensagem_erro():
-    print('\nOcorreu um problema na aplicação, tente novamente.')
+def mensagem_erro(erro):
+    print('\nOcorreu um problema na aplicação, tente novamente.', erro)
 
 
 def mensagem_nenhum_registro(param):
@@ -33,13 +35,8 @@ def inserir_cliente(cliente):
 
 def preencher_cliente():
     cliente = Cliente()
-    cliente.set_nome(input('\nInforme o nome: '))
-    cliente.set_telefone(input('\nInforme o telefone: '))
-    cliente.set_endereco(input('\nInforme o endereco: '))
-    cliente.set_cidade(input('\nInforme a cidade: '))
-    cliente.set_estado(input('\nInforme o estado: '))
-    cliente.set_data_nascimento(input('\nInforme a data de nascimento: '))
-    cliente.set_email(input('\nInforme o email: '))
+    cliente.set_nome(input('\nInforme o seu nome: '))
+    cliente.set_cpf(input('\nInforme o seu cpf: '))
     return cliente
 
 
@@ -57,9 +54,7 @@ def atualizar_cliente(id_cliente, cliente):
 def listar_clientes():
     if col_cliente.estimated_document_count() > 0:
         for cliente in col_cliente.find():
-            print("\nID: ", cliente["_id"], "\nNome: ", cliente["nome"], "\nTelefone: ", cliente["telefone"],
-                  "\nEndereço: ", cliente["endereco"], "\nCidade: ", cliente["cidade"], "\nEstado: ", cliente["estado"],
-                  "\nData Nascimento: ", cliente["data_nascimento"], "\nEmail: ", cliente["email"])
+            print("\nID: ", cliente["_id"], "\nNome: ", cliente["nome"], "\nCpf: ", cliente["cpf"])
     else:
         print("Não existem clientes cadastrados no banco de dados")
 
@@ -75,9 +70,8 @@ def inserir_funcionario(funcionario):
 def preencher_funcionario():
     funcionario = Funcionario()
     funcionario.set_nome(input('\nInforme o nome: '))
-    funcionario.set_telefone(input('\nInforme o telefone: '))
-    funcionario.set_nome_produto_venda(input('\nInforme o nome do produto venda: '))
-    funcionario.set_segmento_produto(input('\nInforme o segmento do produto: '))
+    funcionario.set_cpf(input('\nInforme o CPF do funcionario: '))
+    funcionario.set_salario(input('\nInforme o salario: '))
 
     return funcionario
 
@@ -96,9 +90,8 @@ def atualizar_funcionario(id_funcionario, funcionario):
 def listar_funcionario():
     if col_funcionario.estimated_document_count() > 0:
         for funcionario in col_funcionario.find():
-            print("\nID: ", funcionario["_id"], "\nNome: ", funcionario["nome"], "\nTelefone: ", funcionario["telefone"],
-                  "\nNome produto venda: ", funcionario["nome_produto_venda"], "\nSegmento do produto: ",
-                  funcionario["segmento_produto"])
+            print("\nID: ", funcionario["_id"], "\nNome: ", funcionario["nome"], "\nCpf: ", funcionario["cpf"],
+                  "\nSalario: ", funcionario["salario"])
     else:
         print("Não existem funcionarios cadastrados no banco de dados")
 
@@ -122,7 +115,7 @@ def preencher_produto():
 
 def excluir_produto(id_produto):
     col_produto.delete_one({"_id": ObjectId(id_produto)})
-    print("Lanchonente excluído com sucesso!")
+    print("Produto excluído com sucesso!")
 
 
 def atualizar_produto(id_produto, produto):
@@ -139,6 +132,66 @@ def listar_produto():
                   "\nQuantidade de Produtos: ", produto["qtde_produtos"])
     else:
         print("Não existem produtos cadastrados no banco de dados")
+
+# Metodos da Venda
+
+def inserir_venda(venda):
+    result = col_venda.insert_one(venda.__dict__)
+    if result.inserted_id:
+        print(f'\nA venda {venda.get_id()} foi inserido com sucesso.')
+
+
+def preencher_venda():
+    venda = Venda()
+    venda.set_data(input('\nInforme a data da venda: '))
+    venda.set_cliente_id(input('\nInforme o id do cliente: '))
+    venda.set_funcionario_id(input('\nInforme o id do funcionario: '))
+    return venda
+
+
+def excluir_venda(id_venda):
+    col_venda.delete_one({"_id": ObjectId(id_venda)})
+    print("Venda excluído com sucesso!")
+
+
+def atualizar_venda(id_venda, venda):
+    result = col_venda.update_one({'_id': ObjectId(id_venda)}, {"$set": venda.__dict__})
+    if result.modified_count > 0:
+        print(f'\nA venda {venda.get_nome()} foi alterada com sucesso.')
+
+
+def listar_venda():
+    if col_venda.estimated_document_count() > 0:
+        for venda in col_venda.find():
+            print("\nID: ", venda["_id"], "\Data: ", venda["datga"], "\nId do funcionario: ",
+                  venda["funcionario_id"], "\nId do cliente: ", venda["cliente_id"])
+    else:
+        print("Não existem vendas cadastradas no banco de dados")
+
+# Metodos da Venda Item
+
+def inserir_venda_item(venda_item):
+    result = col_venda_item.insert_one(venda_item.__dict__)
+    if result.inserted_id:
+        print(f'\nA venda item {venda_item.get_id()} foi inserida com sucesso.')
+
+
+def preencher_venda_item():
+    venda_item = VendaItem()
+    venda_item.set_quantidade(input('\nInforme a quantidade de itens: '))
+    venda_item.set_total(input('\nInforme o valor do item: '))
+    venda_item.set_venda_id(input('\nInforme o id da venda: '))
+    venda_item.set_produto_id(input('\nInforme o id do produto: '))
+    return venda_item
+
+def listar_venda_item():
+    if col_venda_item.estimated_document_count() > 0:
+        for venda_item in col_venda_item.find():
+            print("\nID: ", venda_item["_id"], "\nQuantidade: ", venda_item["quantidade"], "\nTotal: ",
+                  venda_item["total"], "\nId da venda: ", venda_item["venda_id"],
+                  "\nId do produto: ", venda_item["produto_id"],)
+    else:
+        print("Não existem vendas itens cadastradas no banco de dados")
 
 continuar = True
 
@@ -158,6 +211,16 @@ while continuar:
     print('\n10 - Listar produto')
     print('\n11 - Excluir produto')
     print('\n12 - Alterar produto')
+    print('\n0 - Sair do sistema')
+    print('\n---------- Menu Venda ---------- ')
+    print('\n13 - Inserir venda')
+    print('\n14 - Listar venda')
+    print('\n15 - Excluir venda')
+    print('\n16 - Alterar venda')
+    print('\n0 - Sair do sistema')
+    print('\n---------- Menu Venda Item ---------- ')
+    print('\n17 - Inserir venda item')
+    print('\n18 - Listar venda item')   
     print('\n0 - Sair do sistema')
 
     opcao = input('\nInforme a opção desejada: ')
@@ -249,6 +312,46 @@ while continuar:
             print("\n=====================Alterar Produto=====================")
             id_produto = str(input("\nInforme o id do Produto: "))
             atualizar_produto(id_produto, preencher_produto())
+        except:
+            mensagem_erro()
+
+    elif opcao == '13':
+        try:
+            print("\n=====================Inserir Venda=====================")
+            inserir_venda(preencher_venda())
+        except:
+            mensagem_erro() 
+    elif opcao == '14':
+        try:
+            print("\n=====================Listar Venda=====================")
+            listar_venda()
+        except:
+            mensagem_erro()
+    elif opcao == '15':
+        try:
+            print("\n=====================Alterar Venda=====================")
+            id_venda = str(input("\nInforme o id da Venda: "))
+            atualizar_venda(id_venda, preencher_venda())
+        except:
+            mensagem_erro()
+    elif opcao == '16':
+        try:
+            print("\n=====================Excluir Venda=====================")
+            id_venda = str(input("\nInforme o id da Venda: "))
+            excluir_venda(id_venda)
+        except:
+            mensagem_erro()
+
+    elif opcao == '17':
+        try:
+            print("\n=====================Inserir Venda Item=====================")
+            inserir_venda_item(preencher_venda_item())
+        except:
+            mensagem_erro() 
+    elif opcao == '18':
+        try:
+            print("\n=====================Listar Venda Item=====================")
+            listar_venda_item()
         except:
             mensagem_erro()
 

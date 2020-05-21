@@ -6,7 +6,6 @@ from Produto import Produto
 from Venda import Venda
 from VendaItem import VendaItem
 
-
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 mydb = myclient["projeto_mongodb_python"]
 col_cliente = mydb["cliente"]
@@ -14,7 +13,6 @@ col_funcionario = mydb["funcionario"]
 col_produto = mydb["produto"]
 col_venda = mydb["venda"]
 col_venda_item = mydb["vendaItem"]
-
 
 
 def mensagem_erro(erro):
@@ -138,7 +136,7 @@ def listar_produto():
 def inserir_venda(venda):
     result = col_venda.insert_one(venda.__dict__)
     if result.inserted_id:
-        print(f'\nA venda {venda.get_id()} foi inserido com sucesso.')
+        print(f'\nA venda do funcionario de id {venda.get_funcionario_id()} foi inserido com sucesso.')
 
 
 def preencher_venda():

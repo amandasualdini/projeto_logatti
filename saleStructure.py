@@ -161,7 +161,7 @@ def atualizar_venda(id_venda, venda):
 def listar_venda():
     if col_venda.estimated_document_count() > 0:
         for venda in col_venda.find():
-            print("\nID: ", venda["_id"], "\Data: ", venda["datga"], "\nId do funcionario: ",
+            print("\nID: ", venda["_id"], "\Data: ", venda["data"], "\nId do funcionario: ",
                   venda["funcionario_id"], "\nId do cliente: ", venda["cliente_id"])
     else:
         print("Não existem vendas cadastradas no banco de dados")

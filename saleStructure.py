@@ -136,7 +136,7 @@ def listar_produto():
 def inserir_venda(venda):
     result = col_venda.insert_one(venda.__dict__)
     if result.inserted_id:
-        print(f'\nA venda do funcionario de id {venda.get_funcionario_id()} foi inserido com sucesso.')
+        print(f'\nA venda do funcionario de id {venda.get_funcionario_id()} foi inserida com sucesso.') #TODO get_id venda
 
 
 def preencher_venda():
@@ -171,7 +171,7 @@ def listar_venda():
 def inserir_venda_item(venda_item):
     result = col_venda_item.insert_one(venda_item.__dict__)
     if result.inserted_id:
-        print(f'\nA venda item {venda_item.get_id()} foi inserida com sucesso.')
+        print(f'\nA venda item {venda_item.get_venda_id()} foi inserida com sucesso.') #TODO get_id venda item
 
 
 def preencher_venda_item():
